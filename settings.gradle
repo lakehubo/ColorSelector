@@ -1,1 +1,1 @@
-include ':app', ':colorselecter'
+include ':app', ':colorselecter', ':circlebtnseek'

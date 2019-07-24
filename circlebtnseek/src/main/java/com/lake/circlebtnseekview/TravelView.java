@@ -26,6 +26,7 @@ public class TravelView extends FrameLayout {
     private PointF currentPoint = new PointF();
 
     private TravelSeekBar seekBar;
+    private NumberPicker numPicker;
     private OnCircleProgressChangeListener onCircleProgressChangeListener;
 
     public TravelView(Context context) {
@@ -58,15 +59,20 @@ public class TravelView extends FrameLayout {
         {
             FrameLayout.MarginLayoutParams layoutParams = new FrameLayout.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutParams.setMargins(200, 200, 200, 200);
-            NumberPicker numPicker = new NumberPicker(context);
-            numPicker.setMaxValue(100);
+            numPicker = new NumberPicker(context);
+            numPicker.setMaxValue(8);
             numPicker.setMinValue(0);
-            numPicker.setValue(50);
+            numPicker.setDisplayedValues(new String[]{"32", "31", "30", "29", "28", "27", "26", "25", "24"});
+            numPicker.setValue(4);
             setNumberPickerDividerColor(numPicker);
             addView(numPicker, layoutParams);
         }
     }
 
+    /**
+     * 反射去掉横线
+     * @param numberPicker
+     */
     private void setNumberPickerDividerColor(NumberPicker numberPicker) {
         NumberPicker picker = numberPicker;
         Field[] pickerFields = NumberPicker.class.getDeclaredFields();
@@ -152,9 +158,16 @@ public class TravelView extends FrameLayout {
         currentPoint.x = x + centerX;
         currentPoint.y = y + centerY;
         seekBar.setCurrentPoint(currentPoint);
-//        double jiao =  Math.toDegrees(Math.atan(currentPoint.y/currentPoint.x));
-//        Log.e("lake", "updateSelector: 度数："+jiao);
-
+        double jiao = Math.toDegrees(Math.atan(Math.abs(x) / Math.abs(y)));
+        if (currentPoint.y < centerY) {
+            jiao = 180 - jiao;
+        }
+        if (onCircleProgressChangeListener != null) {
+            onCircleProgressChangeListener.OnCircleProgressChanged(jiao / 180);
+        }
+        Log.e("lake", "updateSelector: 百分比：" + jiao / 180 * 100);
+        numPicker.setValue(8 - (int) Math.round(jiao / 180 * 8));
+        Log.e("lake", "updateSelector: 度数：" + jiao);
     }
 
     private boolean updateable() {
@@ -167,7 +180,7 @@ public class TravelView extends FrameLayout {
     }
 
     public interface OnCircleProgressChangeListener {
-        void OnCircleProgressChanged(float point);
+        void OnCircleProgressChanged(double point);
     }
 
     public void setOnColorChangeListener(OnCircleProgressChangeListener listener) {

@@ -2,17 +2,14 @@ package com.lake.colorselecter;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.ColorSpace;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
 import java.util.Locale;
-
-import static com.lake.colorselecter.ColorCircleSelector.SELECTOR_RADIUS_DP;
+import static com.lake.colorselecter.Constants.SELECTOR_RADIUS_DP;
 
 public class CircleSelectFrame extends FrameLayout {
 

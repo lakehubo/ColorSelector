@@ -9,9 +9,10 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import static com.lake.colorselecter.Constants.SELECTOR_RADIUS_DP;
+
 public class ColorCircleSelector extends View {
     private Paint selectorPaint,defaultPaint;
-    static final int SELECTOR_RADIUS_DP = 25;
     private float selectorRadiusPx = SELECTOR_RADIUS_DP * 3;
     private PointF currentPoint = new PointF();
 

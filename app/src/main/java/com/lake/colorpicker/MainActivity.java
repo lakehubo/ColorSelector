@@ -20,37 +20,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        colorEt = findViewById(R.id.color_et);
-        circleSelectFrame = findViewById(R.id.color_select_frame);
-
-
-        circleSelectFrame.setOnColorChangeListener(new CircleSelectFrame.OnColorChangeListener() {
-            @Override
-            public void OnColorChanged(String rgb) {
-                colorEt.setText(rgb);
-            }
-        });
-
-        colorEt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                Log.e("lake", "afterTextChanged: "+s.toString());
-                 if(isColorValue(s.toString())){
-                     Log.e("lake", "afterTextChanged: 是颜色值");
-                     circleSelectFrame.setColor(s.toString());
-                 }
-            }
-        });
+//        colorEt = findViewById(R.id.color_et);
+//        circleSelectFrame = findViewById(R.id.color_select_frame);
+//
+//
+//        circleSelectFrame.setOnColorChangeListener(new CircleSelectFrame.OnColorChangeListener() {
+//            @Override
+//            public void OnColorChanged(String rgb) {
+//                colorEt.setText(rgb);
+//            }
+//        });
+//
+//        colorEt.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                Log.e("lake", "afterTextChanged: "+s.toString());
+//                 if(isColorValue(s.toString())){
+//                     Log.e("lake", "afterTextChanged: 是颜色值");
+//                     circleSelectFrame.setColor(s.toString());
+//                 }
+//            }
+//        });
 
     }
 

@@ -2,20 +2,19 @@ package com.lake.circlebtnseekview;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.DebugUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
@@ -31,7 +30,7 @@ public class TravelView extends FrameLayout {
     private PointF currentPoint = new PointF();
 
     private TravelSeekBar seekBar;
-    private NumberPicker numPicker;
+    private NumberScroller numPicker;
     private CircleTravel palette;
 
     private OnCircleProgressChangeListener onCircleProgressChangeListener;
@@ -51,11 +50,12 @@ public class TravelView extends FrameLayout {
         {
             FrameLayout.MarginLayoutParams layoutParams = new FrameLayout.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             layoutParams.setMargins(240, 240, 240, 240);
-            numPicker = new NumberPicker(context);
+            numPicker = new NumberScroller(context);
             numPicker.setMaxValue(8);
             numPicker.setMinValue(0);
             numPicker.setDisplayedValues(new String[]{"32", "31", "30", "29", "28", "27", "26", "25", "24"});
             numPicker.setValue(4);
+            numPicker.setScrollable(false);
             setNumberPickerDividerColor(numPicker);
             addView(numPicker, layoutParams);
         }
@@ -66,6 +66,26 @@ public class TravelView extends FrameLayout {
             imageView.setBackgroundResource(R.mipmap.img_airconditioner_annulus_gray2);
             layoutParams.setMargins(80, 80, 80, 80);
             addView(imageView, layoutParams);
+        }
+
+        {
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            ImageView imageView = new ImageView(context);
+            imageView.setBackgroundResource(R.mipmap.icon_devicecontrol_airconditioning_cold_color);
+            layoutParams.setMargins(215, 0, 0, 0);
+            layoutParams.gravity = Gravity.CENTER_VERTICAL;
+            addView(imageView, layoutParams);//℃
+        }
+
+        {
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            TextView textView = new TextView(context);
+            textView.setTextColor(Color.parseColor("#3b4664"));
+            textView.setText("℃");
+            textView.setTextSize(20);
+            layoutParams.setMargins(500, 0, 0, 30);
+            layoutParams.gravity = Gravity.CENTER_VERTICAL;
+            addView(textView, layoutParams);
         }
 
         {
@@ -85,31 +105,6 @@ public class TravelView extends FrameLayout {
 
     }
 
-    /**
-     * 反射去掉横线
-     *
-     * @param numberPicker
-     */
-    private void setNumberPickerDividerColor(NumberPicker numberPicker) {
-        NumberPicker picker = numberPicker;
-        Field[] pickerFields = NumberPicker.class.getDeclaredFields();
-        for (Field pf : pickerFields) {
-            if (pf.getName().equals("mSelectionDivider")) {
-                pf.setAccessible(true);
-                try {
-                    //设置分割线的颜色值
-                    pf.set(picker, new ColorDrawable(Color.TRANSPARENT));
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                } catch (Resources.NotFoundException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -176,7 +171,6 @@ public class TravelView extends FrameLayout {
         }
         currentPoint.x = x + centerX;
         currentPoint.y = y + centerY;
-//        seekBar.setCurrentPoint(currentPoint);
         double jiao = Math.toDegrees(Math.atan(Math.abs(x) / Math.abs(y)));
         if (currentPoint.y < centerY) {
             jiao = 180 - jiao;
@@ -207,9 +201,36 @@ public class TravelView extends FrameLayout {
 
     public interface OnCircleProgressChangeListener {
         void OnCircleProgressChanged(double point);
+
     }
 
     public void setOnColorChangeListener(OnCircleProgressChangeListener listener) {
         this.onCircleProgressChangeListener = listener;
+    }
+
+    /**
+     * 反射去掉picker横线
+     *
+     * @param numberPicker
+     */
+    private void setNumberPickerDividerColor(NumberPicker numberPicker) {
+        NumberPicker picker = numberPicker;
+        Field[] pickerFields = NumberPicker.class.getDeclaredFields();
+        for (Field pf : pickerFields) {
+            if (pf.getName().equals("mSelectionDivider")) {
+                pf.setAccessible(true);
+                try {
+                    //设置分割线的颜色值 透明
+                    pf.set(picker, new ColorDrawable(Color.TRANSPARENT));
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (Resources.NotFoundException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
     }
 }

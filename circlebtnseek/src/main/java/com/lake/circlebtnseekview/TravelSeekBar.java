@@ -5,12 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class TravelSeekBar extends View {
@@ -21,7 +19,6 @@ public class TravelSeekBar extends View {
     private final Bitmap arrowIcon;
     private final int iconW;
     private final int iconH;
-    private Matrix matrix;
     private volatile float rotation = 0f;//旋转角度
 
     public TravelSeekBar(Context context) {
@@ -36,17 +33,21 @@ public class TravelSeekBar extends View {
         super(context, attrs, defStyleAttr);
 
         selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        selectorPaint.setFilterBitmap(true);
 
         defaultPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         defaultPaint.setColor(Color.WHITE);
         defaultPaint.setStyle(Paint.Style.FILL);
         defaultPaint.setShadowLayer(5, 0, 4, Color.LTGRAY);
 
-        arrowIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.img_airconditioner_twoarrows);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        arrowIcon = BitmapFactory.decodeResource(getResources(), R.mipmap.img_airconditioner_twoarrows, options).copy(Bitmap.Config.ARGB_8888, true);
+        arrowIcon.setDensity(getResources().getDisplayMetrics().densityDpi);
+
         iconW = arrowIcon.getWidth() / 2;
         iconH = arrowIcon.getHeight() / 2;
-
-        matrix = new Matrix();
     }
 
     @Override

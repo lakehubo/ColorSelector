@@ -2,15 +2,19 @@ package com.lake.circlebtnseekview;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.DebugUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.NumberPicker;
 
 import java.lang.reflect.Field;
@@ -19,14 +23,17 @@ public class TravelView extends FrameLayout {
     private long lastPassedEventTime = 0;
     private int minInterval = 100 / 60;//16ms
     private float radius;
+    private float iconRadius;
     private float centerX;
     private float centerY;
 
-    private float selectorRadiusPx = 20 * 3;
+    private final float paddingRadiusPx;
     private PointF currentPoint = new PointF();
 
     private TravelSeekBar seekBar;
     private NumberPicker numPicker;
+    private CircleTravel palette;
+
     private OnCircleProgressChangeListener onCircleProgressChangeListener;
 
     public TravelView(Context context) {
@@ -39,26 +46,11 @@ public class TravelView extends FrameLayout {
 
     public TravelView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        selectorRadiusPx = 20 * getResources().getDisplayMetrics().density;
-
-        {
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            CircleTravel palette = new CircleTravel(context);
-            int padding = (int) selectorRadiusPx;
-            palette.setPadding(padding, padding, padding, padding);
-            addView(palette, layoutParams);
-        }
-
-        {
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            seekBar = new TravelSeekBar(context);
-            seekBar.setSelectorRadiusPx(selectorRadiusPx);
-            addView(seekBar, layoutParams);
-        }
+        paddingRadiusPx = 20 * getResources().getDisplayMetrics().density;
 
         {
             FrameLayout.MarginLayoutParams layoutParams = new FrameLayout.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            layoutParams.setMargins(200, 200, 200, 200);
+            layoutParams.setMargins(240, 240, 240, 240);
             numPicker = new NumberPicker(context);
             numPicker.setMaxValue(8);
             numPicker.setMinValue(0);
@@ -67,10 +59,35 @@ public class TravelView extends FrameLayout {
             setNumberPickerDividerColor(numPicker);
             addView(numPicker, layoutParams);
         }
+
+        {
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            ImageView imageView = new ImageView(context);
+            imageView.setBackgroundResource(R.mipmap.img_airconditioner_annulus_gray2);
+            layoutParams.setMargins(80, 80, 80, 80);
+            addView(imageView, layoutParams);
+        }
+
+        {
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            palette = new CircleTravel(context);
+            int padding = (int) paddingRadiusPx;
+            palette.setPadding(padding, padding, padding, padding);
+            addView(palette, layoutParams);
+        }
+
+
+        {
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            seekBar = new TravelSeekBar(context);
+            addView(seekBar, layoutParams);
+        }
+
     }
 
     /**
      * 反射去掉横线
+     *
      * @param numberPicker
      */
     private void setNumberPickerDividerColor(NumberPicker numberPicker) {
@@ -109,11 +126,13 @@ public class TravelView extends FrameLayout {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         int netWidth = w - getPaddingLeft() - getPaddingRight();
         int netHeight = h - getPaddingTop() - getPaddingBottom();
-        radius = Math.min(netWidth, netHeight) * 0.5f - selectorRadiusPx;
+        radius = Math.min(netWidth, netHeight) * 0.5f - paddingRadiusPx;
         if (radius < 0) return;
+        iconRadius = radius - 90;
         centerX = netWidth * 0.5f;
         centerY = netHeight * 0.5f;
-        currentPoint.x = centerX + radius;
+
+        currentPoint.x = centerX + iconRadius;
         currentPoint.y = centerY;
         seekBar.setCurrentPoint(currentPoint);
     }
@@ -148,25 +167,28 @@ public class TravelView extends FrameLayout {
         float x = eventX - centerX;
         float y = eventY - centerY;
         double r = Math.sqrt(x * x + y * y);
-        if (r > radius) {
-            x *= radius / r;
-            y *= radius / r;
+        if (r > iconRadius) {
+            x *= iconRadius / r;
+            y *= iconRadius / r;
         } else {
-            x /= r / radius;
-            y /= r / radius;
+            x /= r / iconRadius;
+            y /= r / iconRadius;
         }
         currentPoint.x = x + centerX;
         currentPoint.y = y + centerY;
-        seekBar.setCurrentPoint(currentPoint);
+//        seekBar.setCurrentPoint(currentPoint);
         double jiao = Math.toDegrees(Math.atan(Math.abs(x) / Math.abs(y)));
         if (currentPoint.y < centerY) {
             jiao = 180 - jiao;
         }
+        seekBar.setCurrentPointAndRotation(currentPoint, (float) jiao);
         if (onCircleProgressChangeListener != null) {
             onCircleProgressChangeListener.OnCircleProgressChanged(jiao / 180);
         }
-        Log.e("lake", "updateSelector: 百分比：" + jiao / 180 * 100);
+        double progress = jiao / 180 * 100;
+        Log.e("lake", "updateSelector: 百分比：" + progress);
         numPicker.setValue(8 - (int) Math.round(jiao / 180 * 8));
+        palette.showProgress(jiao);
         Log.e("lake", "updateSelector: 度数：" + jiao);
     }
 

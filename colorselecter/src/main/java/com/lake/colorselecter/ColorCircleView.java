@@ -19,7 +19,6 @@ public class ColorCircleView extends View {
 
     private Paint huePaint;
     private Paint saturationPaint;
-    private Paint shadowPaint;
 
     public ColorCircleView(Context context) {
         this(context, null);
@@ -33,7 +32,6 @@ public class ColorCircleView extends View {
         super(context, attrs, defStyleAttr);
         huePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         saturationPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
 
     @Override
@@ -54,15 +52,10 @@ public class ColorCircleView extends View {
         Shader radialGradient = new RadialGradient(centerX, centerY, radius,
                 Color.WHITE, 0x00FFFFFF, Shader.TileMode.CLAMP);
         saturationPaint.setShader(radialGradient);
-
-        Shader shadow = new  RadialGradient(centerX+5, centerY+5, radius+15,
-                0xff000000, 0x01000000, Shader.TileMode.CLAMP);
-        shadowPaint.setShader(shadow);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawCircle(centerX+5, centerY+5, radius+15, shadowPaint);
         canvas.drawCircle(centerX, centerY, radius, huePaint);
         canvas.drawCircle(centerX, centerY, radius, saturationPaint);
     }

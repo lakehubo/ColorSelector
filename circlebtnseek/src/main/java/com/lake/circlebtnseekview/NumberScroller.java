@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.NumberPicker;
 
 import java.util.ArrayList;
@@ -61,6 +60,9 @@ public class NumberScroller extends NumberPicker {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
     }
+
+
 }

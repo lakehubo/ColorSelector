@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class TravelSeekBar extends View {
@@ -51,7 +52,7 @@ public class TravelSeekBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.drawCircle(currentPoint.x, currentPoint.y, selectorRadiusPx * 1f, defaultPaint);
-        canvas.rotate(rotation);
+        canvas.rotate(rotation, currentPoint.x, currentPoint.y);
         canvas.drawBitmap(arrowIcon, currentPoint.x - iconW, currentPoint.y - iconH, selectorPaint);
     }
 
@@ -62,7 +63,11 @@ public class TravelSeekBar extends View {
      */
     public void setCurrentPointAndRotation(PointF currentPoint, Float rotation) {
         this.currentPoint = currentPoint;
-        this.rotation = rotation;
+        if (rotation < 0) {
+            this.rotation = rotation < -90f ? (rotation + 90f) : (rotation - 90f);
+        } else {
+            this.rotation = rotation > 90f ? -(rotation - 90f) : -(rotation + 90f);
+        }
         invalidate();
     }
 

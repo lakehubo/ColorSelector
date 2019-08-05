@@ -181,7 +181,11 @@ public class TravelView extends FrameLayout {
         if (currentPoint.y < centerY) {
             jiao = 180 - jiao;
         }
-        seekBar.setCurrentPointAndRotation(currentPoint, (float) jiao);
+        float degress = (float) jiao;
+        if (currentPoint.x < centerX) {
+            degress = (float) jiao - 180;
+        }
+        seekBar.setCurrentPointAndRotation(currentPoint, degress);
         if (onCircleProgressChangeListener != null) {
             onCircleProgressChangeListener.OnCircleProgressChanged(jiao / 180);
         }
